@@ -8,8 +8,8 @@ class Ship {
   val fields: mutable.Set[Field] = collection.mutable.Set()
   var shotsTaken = 0
 
-  def addField(field: Field) = {
-    if(size() >= maxFieldsNum) throw new Exception("Ship is already too big")
+  def addField(field: Field): Unit = {
+    if(size() >= maxFieldsNum) throw new IllegalArgumentException("Ship is already too big")
     else if(size() == 0) fields.add(field)
     else {
       var flag = false
@@ -17,7 +17,7 @@ class Ship {
       if(flag)
         fields.add(field)
       else
-        throw new Exception("Cannot add field " + field + " to the ship - not a neighbor of any of ship's part")
+        throw new IllegalArgumentException("Cannot add field " + field + " to the ship - not a neighbor of any of ship's part")
     }
   }
 

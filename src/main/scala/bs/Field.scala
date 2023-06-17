@@ -1,24 +1,23 @@
 package bs
 
-class Field (val c: Char, val r: Int){
+class Field (val r: Int, val c: Char){
   if(c < 'A' || c > 'J') throw new Exception("Column out of range")
   if(r < 1 || r > 10) throw new Exception("Row out of range")
   var wasShot = false
   var ship : Option[Ship] = None
 
+
   def isWallNeighbor(other: Field): Boolean = {
-    other.c match {
-      case this.c => other.r == this.r + 1 || other.r == this.r - 1
-      case this.c - 1 | this.c + 1 => other.r == this.r
-      case _ => false
-    }
+    if(this.c == other.c)
+      other.r == this.r + 1 || other.r == this.r - 1
+    else if(this.c == other.c + 1 || this.c == other.c - 1)
+      this.r == other.r
+    else
+      false
   }
 
   def isDiagonalNeighbor(other: Field): Boolean = {
-    other.c match {
-      case this.c - 1 | this.c + 1 => other.r == this.r + 1 || other.r == this.r -1
-      case _ => false
-    }
+    (other.c == this.c + 1 || other.c == this.c - 1) && (this.r == other.r + 1 || this.r == other.r -1)
   }
 
   def isAnyNeighbor(other: Field): Boolean = {
@@ -31,7 +30,7 @@ class Field (val c: Char, val r: Int){
 
   override def equals(other : Any): Boolean ={
     other match {
-      case otherField: Field => (this.canEqual(other) && this.c == otherField.c && this.r == otherField.r)
+      case otherField: Field => this.canEqual(other) && this.c == otherField.c && this.r == otherField.r
       case _ => false
     }
   }
@@ -51,7 +50,10 @@ class Field (val c: Char, val r: Int){
   def addShip(ship: Ship): Unit = {
     if(this.ship.isDefined)
       throw new Exception("Field already contains a ship")
-    else this.ship = Some(ship)
+    else{
+      this.ship = Some(ship)
+      ship.addField(this)
+    }
   }
 
   def removeShip(): Ship = {
@@ -71,5 +73,5 @@ class Field (val c: Char, val r: Int){
       false
   }
 
-  def hasShip(): Boolean = ship.isDefined
+  def hasShip: Boolean = ship.isDefined
 }
