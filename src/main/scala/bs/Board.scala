@@ -11,10 +11,13 @@ class Board {
   def addShip(row: Int, collumn: Char): Unit = {
     val r = row-1
     val c = ctoi(collumn)
+    var cornerShips = mutable.Set[Ship]()
     for(nbhInd <- getCornerNbhIndexes(r, c)){
       if(fields(nbhInd.head)(nbhInd(1)).hasShip)
-        throw new IllegalArgumentException("Cannot place ship in the corner of the other ship")
+        cornerShips.add(fields(nbhInd.head)(nbhInd(1)).ship.get)
     }
+    if(cornerShips.size > 1)
+     throw new IllegalArgumentException("Cannot place ship in the corner of the other ship")
     var field: Option[Field] = None
     for(nbhInd <- getWallNbhIndexes(r, c)){
       if(fields(nbhInd.head)(nbhInd(1)).hasShip){
@@ -22,13 +25,18 @@ class Board {
         else field = Some(fields(nbhInd.head)(nbhInd(1)))
       }
     }
-    if(field.isDefined)
+    if(field.isDefined) {
+      if(cornerShips.nonEmpty && field.get.ship.get != cornerShips.head)
+        throw new IllegalArgumentException("Cannot place ship in the corner of the other ship")
       fields(r)(c).addShip(field.get.ship.get)
-    else {
+    } else {
+      if(cornerShips.nonEmpty)
+        throw new IllegalArgumentException("Cannot place ship in the corner of the other ship")
       fields(r)(c).addShip(new Ship())
       ships.add(fields(r)(c).ship.get)
     }
   }
+
   def removeShip(r: Int, c: Char): Unit = fields(r-1)(ctoi(c)).removeShip()
 
   def getShipNumBySize: mutable.HashMap[Int, Int] = {
@@ -41,6 +49,8 @@ class Board {
     }
     sizes
   }
+
+  def shot(r: Int, c: Char): Unit = fields(r-1)(ctoi(c)).shot()
 
   override def toString: String = {
     var str: String = "   "
@@ -70,6 +80,7 @@ class Board {
     }
     str
   }
+
   def toStringHidden: String = {
     var str: String = ""
     for (row <- fields) {
@@ -91,6 +102,7 @@ class Board {
 object Board {
   val height = 10
   val width = 10
+  val legend = "| | - empty field\n|#| - ship\n|*| - shot empty field\n|X| - shot ship"
   def ctoi(a: Char): Int = a.toInt - 65
   def itoc(i: Int): Char = (i+65).toChar
   def getWallNbhIndexes(rInd: Int, cInd: Int): mutable.Set[Seq[Int]] = {
@@ -109,4 +121,6 @@ object Board {
     }
     nbh
   }
+
+
 }
