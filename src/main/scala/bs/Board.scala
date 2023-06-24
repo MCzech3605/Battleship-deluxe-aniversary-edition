@@ -1,6 +1,7 @@
 package bs
 
-import bs.Board.{ctoi, getCornerNbhIndexes, getWallNbhIndexes, height, itoc, width}
+import bs.Board.*
+
 import scala.collection.mutable
 
 class Board {
@@ -8,9 +9,7 @@ class Board {
   for(i <- 0 until height; j <- 0 until width) fields(i)(j) = new Field(i+1, itoc(j))
   val ships: mutable.Set[Ship] = mutable.Set()
 
-  def addShip(row: Int, collumn: Char): Unit = {
-    val r = row-1
-    val c = ctoi(collumn)
+  def addShip(r: Int, c: Int): Unit = {
     var cornerShips = mutable.Set[Ship]()
     for(nbhInd <- getCornerNbhIndexes(r, c)){
       if(fields(nbhInd.head)(nbhInd(1)).hasShip)
@@ -111,6 +110,9 @@ object Board {
       if(rInd + i < height && rInd + i >= 0) nbh.add(Seq(rInd+i, cInd))
       if(cInd + i < width && cInd + i >= 0) nbh.add(Seq(rInd, cInd+i))
     }
+//    println(rInd)
+//    println(cInd)
+//    println(nbh)
     nbh
   }
   def getCornerNbhIndexes(rInd: Int, cInd: Int): mutable.Set[Seq[Int]] = {

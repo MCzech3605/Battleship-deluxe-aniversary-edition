@@ -49,10 +49,10 @@ class Field (val r: Int, val c: Char){
 
   def addShip(ship: Ship): Unit = {
     if(this.ship.isDefined)
-      throw new Exception("Field already contains a ship")
+      throw new IllegalArgumentException("Field already contains a ship")
     else{
-      this.ship = Some(ship)
       ship.addField(this)
+      this.ship = Some(ship)
     }
   }
 
