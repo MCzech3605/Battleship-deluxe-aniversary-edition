@@ -36,17 +36,17 @@ class Board {
     }
   }
 
-  def removeShip(r: Int, c: Char): Unit = fields(r-1)(ctoi(c)).removeShip()
+  def removeShip(r: Int, c: Int): Unit = {
+    val shipToRemove = fields(r)(c).ship
+    if shipToRemove.isEmpty then {return}
+      
+    shipToRemove.get.removeField(fields(r)(c))
+    fields(r)(c).ship = None
+    if shipToRemove.get.size == 0 then ships.remove(shipToRemove.get)
+  }
 
-  def getShipNumBySize: mutable.HashMap[Int, Int] = {
-    val sizes: mutable.HashMap[Int, Int] = mutable.HashMap()
-    for(i <- 1 to 4){
-      sizes.addOne((i, 0))
-    }
-    for(ship <- ships){
-      sizes(ship.size()) += 1
-    }
-    sizes
+  def getShipNumBySize: Map[Int, Int] = {
+    ships.toList.map(s => s.fields.size).groupBy(identity).view.mapValues(_.size).toMap
   }
 
   def shot(r: Int, c: Char): Unit = fields(r-1)(ctoi(c)).shot()
@@ -101,6 +101,8 @@ class Board {
 object Board {
   val height = 10
   val width = 10
+//  val requiredShipAmountsBySize: Map[Int, Int] = collection.immutable.Map(1 -> 4, 2 -> 3, 3 -> 2, 4 -> 1)
+  val requiredShipAmountsBySize: Map[Int, Int] = collection.immutable.Map(1 -> 1)
   val legend = "| | - empty field\n|#| - ship\n|*| - shot empty field\n|X| - shot ship"
   def ctoi(a: Char): Int = a.toInt - 65
   def itoc(i: Int): Char = (i+65).toChar

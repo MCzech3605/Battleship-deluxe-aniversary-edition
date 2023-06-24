@@ -56,11 +56,10 @@ class Field (val r: Int, val c: Char){
     }
   }
 
-  def removeShip(): Ship = {
-    if(ship.isEmpty) throw new Exception("Cannot remove a ship, field already unoccupied")
-    var tmp = this.ship.get
+  def removeShip(): Unit = {
+    if(ship.isEmpty) throw new IllegalArgumentException("Cannot remove a ship, field already unoccupied")
+    ship.get.removeField(this)
     this.ship = None
-    tmp
   }
 
   def shot(): Boolean = {
