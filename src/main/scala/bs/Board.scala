@@ -17,6 +17,7 @@ class Board {
     }
     if(cornerShips.size > 1)
      throw new IllegalArgumentException("Cannot place ship in the corner of the other ship")
+
     var field: Option[Field] = None
     for(nbhInd <- getWallNbhIndexes(r, c)){
       if(fields(nbhInd.head)(nbhInd(1)).hasShip){
@@ -49,7 +50,9 @@ class Board {
     ships.toList.map(s => s.fields.size).groupBy(identity).view.mapValues(_.size).toMap
   }
 
-  def shot(r: Int, c: Char): Unit = fields(r-1)(ctoi(c)).shot()
+  def shoot(r: Int, c: Int): ShotResult = {
+    fields(r)(c).shoot()
+  }
 
   override def toString: String = {
     var str: String = "   "
@@ -101,8 +104,8 @@ class Board {
 object Board {
   val height = 10
   val width = 10
-//  val requiredShipAmountsBySize: Map[Int, Int] = collection.immutable.Map(1 -> 4, 2 -> 3, 3 -> 2, 4 -> 1)
-  val requiredShipAmountsBySize: Map[Int, Int] = collection.immutable.Map(1 -> 1)
+  val requiredShipAmountsBySize: Map[Int, Int] = collection.immutable.Map(1 -> 4, 2 -> 3, 3 -> 2, 4 -> 1)
+//  val requiredShipAmountsBySize: Map[Int, Int] = collection.immutable.Map(1 -> 1)
   val legend = "| | - empty field\n|#| - ship\n|*| - shot empty field\n|X| - shot ship"
   def ctoi(a: Char): Int = a.toInt - 65
   def itoc(i: Int): Char = (i+65).toChar

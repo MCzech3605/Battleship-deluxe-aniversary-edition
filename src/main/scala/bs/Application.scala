@@ -1,5 +1,6 @@
 package bs
 
+import bs.gui.{MainMenu, PlayerInterface, PlayerSwitchPanel, VictoryScreen}
 import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.beans.property.ReadOnlyDoubleProperty
@@ -11,7 +12,7 @@ import scalafx.scene.effect.DropShadow
 import scalafx.scene.layout.{HBox, VBox}
 import scalafx.scene.paint.*
 import scalafx.scene.paint.Color.*
-import scalafx.scene.text.{Text, Font}
+import scalafx.scene.text.{Font, Text}
 import scalafx.scene.text.TextIncludes.jfxFont2sfxFont
 
 import scala.language.implicitConversions
@@ -25,13 +26,15 @@ object Application extends JFXApp3 {
     val player2Board = new Board()
     val player1Interface = new PlayerInterface(player1Board, player2Board)
     val player2Interface = new PlayerInterface(player2Board, player1Board)
-    
-    val playerSwitchPanel = new PlayerSwitchPanel((player1Interface, player2Interface))
-    
+
+    PlayerSwitchPanel.player1Interface = Some(player1Interface)
+    PlayerSwitchPanel.player2Interface = Some(player2Interface)
     MainMenu.player1Interface = Some(player1Interface)
-    player1Interface.playerSwitchPanel = Some(playerSwitchPanel)
-    player2Interface.playerSwitchPanel = Some(playerSwitchPanel)
-    
+    player1Interface.opponentInterface = Some(player2Interface)
+    player2Interface.opponentInterface = Some(player1Interface)
+    VictoryScreen.player1Interface = Some(player1Interface)
+    VictoryScreen.player2Interface = Some(player2Interface)
+
     stage.scene = MainMenu.scene
   }
 }

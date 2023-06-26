@@ -44,7 +44,7 @@ class Field (val r: Int, val c: Char){
   }
 
   override def toString: String = {
-    c + r.toString
+    s"$c$r"
   }
 
   def addShip(ship: Ship): Unit = {
@@ -62,14 +62,14 @@ class Field (val r: Int, val c: Char){
     this.ship = None
   }
 
-  def shot(): Boolean = {
+  def shoot(): ShotResult = {
     if(wasShot)
-      throw new Exception("Cannot shoot same field twice")
+      throw new IllegalArgumentException("Cannot shoot the same field twice")
     wasShot = true
     if(ship.isDefined)
-      ship.get.shot()
+      ship.get.shoot()
     else
-      false
+      ShotResult.MISS
   }
 
   def hasShip: Boolean = ship.isDefined

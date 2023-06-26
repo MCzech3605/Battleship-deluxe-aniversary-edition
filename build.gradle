@@ -54,5 +54,5 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = 'bs.MainMenu'
+    mainClass = 'bs.Application'
 }

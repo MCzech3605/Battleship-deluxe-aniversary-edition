@@ -9,7 +9,7 @@ class Ship {
   var shotsTaken = 0
 
   def addField(field: Field): Unit = {
-    if(fields.size >= maxFieldsNum) throw new IllegalArgumentException("Ship is already too big")
+    if(fields.size >= maxFieldsNum) throw new IllegalArgumentException("Ship is already of maximum size")
     else if(fields.isEmpty) fields.add(field)
     else {
       var flag = false
@@ -30,12 +30,13 @@ class Ship {
   
   def size: Int = fields.size
 
-  def shot(): Boolean = {
+  def shoot(): ShotResult = {
     shotsTaken += 1
-    shotsTaken == fields.size
+    if shotsTaken == size then ShotResult.HIT_AND_SINK
+    else ShotResult.HIT
   }
 }
 
 object Ship {
-  val maxFieldsNum = 4
+  val maxFieldsNum: Int = Board.requiredShipAmountsBySize.values.max
 }

@@ -1,5 +1,6 @@
-package bs
+package bs.gui
 
+import bs.Application
 import scalafx.Includes.*
 import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.event.ActionEvent
@@ -8,15 +9,19 @@ import scalafx.geometry.Pos.Center
 import scalafx.scene.Scene
 import scalafx.scene.control.Button
 import scalafx.scene.layout.{HBox, VBox}
-import scalafx.scene.text.Text
+import scalafx.scene.text.{Font, Text}
 
-class PlayerSwitchPanel(private val playerInterfaces: (PlayerInterface, PlayerInterface)) {
+object PlayerSwitchPanel {
   private val primaryStage = Application.stage
+
+  var player1Interface: Option[PlayerInterface] = None
+  var player2Interface: Option[PlayerInterface] = None
 
   private var currPlayer = 2
 
   private val startTurnButton = new Button:
     text = "Player 2 - Start Turn"
+    font = new Font(15)
     prefHeight = 100
     prefWidth = 200
     alignment = Center
@@ -37,11 +42,11 @@ class PlayerSwitchPanel(private val playerInterfaces: (PlayerInterface, PlayerIn
 
   private def loadPlayerInterface(event: ActionEvent): Unit = {
     if currPlayer == 1 then {
-      playerInterfaces._1.load()
+      player1Interface.get.load()
       currPlayer = 2
     }
     else {
-      playerInterfaces._2.load()
+      player2Interface.get.load()
       currPlayer = 1
     }
     startTurnButton.text = s"Player $currPlayer - Start Turn"
