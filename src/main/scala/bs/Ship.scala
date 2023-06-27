@@ -38,5 +38,5 @@ class Ship {
 }
 
 object Ship {
-  val maxFieldsNum: Int = Board.requiredShipAmountsBySize.values.max
+  val maxFieldsNum: Int = Board.requiredShipAmountsBySize.keys.max
 }

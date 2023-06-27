@@ -21,7 +21,8 @@ class Board {
     var field: Option[Field] = None
     for(nbhInd <- getWallNbhIndexes(r, c)){
       if(fields(nbhInd.head)(nbhInd(1)).hasShip){
-        if(field.isDefined) throw new IllegalArgumentException("Cannot merge 2 ships")
+        if(field.isDefined && field.get.ship.get != fields(nbhInd.head)(nbhInd(1)).ship.get)
+          throw new IllegalArgumentException("Cannot merge 2 ships")
         else field = Some(fields(nbhInd.head)(nbhInd(1)))
       }
     }
@@ -128,6 +129,4 @@ object Board {
     }
     nbh
   }
-
-
 }
