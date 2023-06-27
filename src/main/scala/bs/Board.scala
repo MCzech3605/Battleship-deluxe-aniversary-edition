@@ -8,6 +8,7 @@ class Board {
   val fields: Array[Array[Field]] = Array.ofDim[Field](height, width)
   for(i <- 0 until height; j <- 0 until width) fields(i)(j) = new Field(i+1, itoc(j))
   val ships: mutable.Set[Ship] = mutable.Set()
+  var lastAutoShotIndexes: mutable.Set[mutable.Seq[Int]] = mutable.Set()
 
   def addShip(r: Int, c: Int): Unit = {
     var cornerShips = mutable.Set[Ship]()
@@ -52,7 +53,26 @@ class Board {
   }
 
   def shoot(r: Int, c: Int): ShotResult = {
-    fields(r)(c).shoot()
+    val res = fields(r)(c).shoot()
+    if(res == ShotResult.HIT_AND_SINK){
+      lastAutoShotIndexes = lastAutoShotIndexes.empty
+      val fieldsToMark = mutable.Set[Field]()
+      for(shipPart <- fields(r)(c).ship.get.fields){
+        for(neighbor <- getWallNbhIndexes(shipPart.r-1, ctoi(shipPart.c))) {
+          fieldsToMark.add(fields(neighbor.head)(neighbor(1)))
+        }
+        for (neighbor <- getCornerNbhIndexes(shipPart.r - 1, ctoi(shipPart.c))) {
+          fieldsToMark.add(fields(neighbor.head)(neighbor(1)))
+        }
+      }
+      for(field <- fieldsToMark){
+        if(!field.wasShot){
+          field.shoot()
+          lastAutoShotIndexes.add(mutable.Seq(field.r-1, ctoi(field.c)))
+        }
+      }
+    }
+    res
   }
 
   override def toString: String = {

@@ -25,7 +25,7 @@ class PlayerInterface(private val playerBoard: Board, private val opponentBoard:
   private val primaryStage = Application.stage
   var opponentInterface: Option[PlayerInterface] = None
 
-  val playerGrid = new GridPane:
+  val playerGrid: GridPane = new GridPane:
     gridLinesVisible = true
     alignment = Center
     onMouseClicked = clickPlayerBoard
@@ -240,6 +240,9 @@ class PlayerInterface(private val playerBoard: Board, private val opponentBoard:
       if shotResult.hit then {
         opponentGridRectangles(rowIndex - 1)(columnIndex - 1).fill = Color(1, 0, 0, 1)
         opponentInterface.get.playerGridRectangles(rowIndex - 1)(columnIndex - 1).fill = Color(1, 0, 0, 1)
+        if(shotResult == ShotResult.HIT_AND_SINK){
+          autoShot()
+        }
         if opponentInterface.get.didLoseAllShips() then {
           isVictorious = true
           turnComplete = true
@@ -266,6 +269,12 @@ class PlayerInterface(private val playerBoard: Board, private val opponentBoard:
     playerBoard.ships.forall(s => s.shotsTaken == s.size)
   }
 
+  private def autoShot(): Unit = {
+    for(ind <- opponentBoard.lastAutoShotIndexes){
+      opponentGridRectangles(ind.head)(ind(1)).fill = Color(0.7, 0.7, 0.7, 1)
+      opponentInterface.get.playerGridRectangles(ind.head)(ind(1)).fill = Color(0.7, 0.7, 0.7, 1)
+    }
+  }
 }
 object PlayerInterface {
   private val cellWidth = 35
