@@ -1,6 +1,7 @@
 package bs
 
-import bs.Board.{ctoi, getCornerNbhIndexes, getWallNbhIndexes, height, itoc, width}
+import bs.Board.*
+
 import scala.collection.mutable
 
 class Board {
@@ -8,9 +9,7 @@ class Board {
   for(i <- 0 until height; j <- 0 until width) fields(i)(j) = new Field(i+1, itoc(j))
   val ships: mutable.Set[Ship] = mutable.Set()
 
-  def addShip(row: Int, collumn: Char): Unit = {
-    val r = row-1
-    val c = ctoi(collumn)
+  def addShip(r: Int, c: Int): Unit = {
     var cornerShips = mutable.Set[Ship]()
     for(nbhInd <- getCornerNbhIndexes(r, c)){
       if(fields(nbhInd.head)(nbhInd(1)).hasShip)
@@ -18,6 +17,7 @@ class Board {
     }
     if(cornerShips.size > 1)
      throw new IllegalArgumentException("Cannot place ship in the corner of the other ship")
+
     var field: Option[Field] = None
     for(nbhInd <- getWallNbhIndexes(r, c)){
       if(fields(nbhInd.head)(nbhInd(1)).hasShip){
@@ -37,20 +37,22 @@ class Board {
     }
   }
 
-  def removeShip(r: Int, c: Char): Unit = fields(r-1)(ctoi(c)).removeShip()
-
-  def getShipNumBySize: mutable.HashMap[Int, Int] = {
-    val sizes: mutable.HashMap[Int, Int] = mutable.HashMap()
-    for(i <- 1 to 4){
-      sizes.addOne((i, 0))
-    }
-    for(ship <- ships){
-      sizes(ship.size()) += 1
-    }
-    sizes
+  def removeShip(r: Int, c: Int): Unit = {
+    val shipToRemove = fields(r)(c).ship
+    if shipToRemove.isEmpty then {return}
+      
+    shipToRemove.get.removeField(fields(r)(c))
+    fields(r)(c).ship = None
+    if shipToRemove.get.size == 0 then ships.remove(shipToRemove.get)
   }
 
-  def shot(r: Int, c: Char): Unit = fields(r-1)(ctoi(c)).shot()
+  def getShipNumBySize: Map[Int, Int] = {
+    ships.toList.map(s => s.fields.size).groupBy(identity).view.mapValues(_.size).toMap
+  }
+
+  def shoot(r: Int, c: Int): ShotResult = {
+    fields(r)(c).shoot()
+  }
 
   override def toString: String = {
     var str: String = "   "
@@ -102,6 +104,8 @@ class Board {
 object Board {
   val height = 10
   val width = 10
+  val requiredShipAmountsBySize: Map[Int, Int] = collection.immutable.Map(1 -> 4, 2 -> 3, 3 -> 2, 4 -> 1)
+//  val requiredShipAmountsBySize: Map[Int, Int] = collection.immutable.Map(1 -> 1)
   val legend = "| | - empty field\n|#| - ship\n|*| - shot empty field\n|X| - shot ship"
   def ctoi(a: Char): Int = a.toInt - 65
   def itoc(i: Int): Char = (i+65).toChar
@@ -111,6 +115,9 @@ object Board {
       if(rInd + i < height && rInd + i >= 0) nbh.add(Seq(rInd+i, cInd))
       if(cInd + i < width && cInd + i >= 0) nbh.add(Seq(rInd, cInd+i))
     }
+//    println(rInd)
+//    println(cInd)
+//    println(nbh)
     nbh
   }
   def getCornerNbhIndexes(rInd: Int, cInd: Int): mutable.Set[Seq[Int]] = {

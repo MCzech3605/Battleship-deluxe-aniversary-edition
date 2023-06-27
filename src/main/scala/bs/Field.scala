@@ -44,33 +44,32 @@ class Field (val r: Int, val c: Char){
   }
 
   override def toString: String = {
-    c + r.toString
+    s"$c$r"
   }
 
   def addShip(ship: Ship): Unit = {
     if(this.ship.isDefined)
-      throw new Exception("Field already contains a ship")
+      throw new IllegalArgumentException("Field already contains a ship")
     else{
-      this.ship = Some(ship)
       ship.addField(this)
+      this.ship = Some(ship)
     }
   }
 
-  def removeShip(): Ship = {
-    if(ship.isEmpty) throw new Exception("Cannot remove a ship, field already unoccupied")
-    var tmp = this.ship.get
+  def removeShip(): Unit = {
+    if(ship.isEmpty) throw new IllegalArgumentException("Cannot remove a ship, field already unoccupied")
+    ship.get.removeField(this)
     this.ship = None
-    tmp
   }
 
-  def shot(): Boolean = {
+  def shoot(): ShotResult = {
     if(wasShot)
-      throw new Exception("Cannot shoot same field twice")
+      throw new IllegalArgumentException("Cannot shoot the same field twice")
     wasShot = true
     if(ship.isDefined)
-      ship.get.shot()
+      ship.get.shoot()
     else
-      false
+      ShotResult.MISS
   }
 
   def hasShip: Boolean = ship.isDefined
