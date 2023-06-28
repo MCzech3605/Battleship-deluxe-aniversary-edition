@@ -16,6 +16,8 @@ import scalafx.scene.shape.Rectangle
 import scalafx.scene.text.{Font, Text}
 import scalafx.scene.{Node, Scene}
 import scalafx.stage.Stage
+import org.controlsfx.control.Notifications
+import scalafx.util.Duration
 
 
 class PlayerInterface(private val playerBoard: Board, private val opponentBoard: Board) {
@@ -213,7 +215,7 @@ class PlayerInterface(private val playerBoard: Board, private val opponentBoard:
       playerBoard.addShip(rowIndex - 1, columnIndex - 1)
       playerGridRectangles(rowIndex - 1)(columnIndex - 1).fill = Color(0, 0, 1, 1)
     } catch {
-      case e: IllegalArgumentException => println(e)
+      case e: IllegalArgumentException => errorNotification(e)
     }
   }
 
@@ -222,7 +224,7 @@ class PlayerInterface(private val playerBoard: Board, private val opponentBoard:
       playerBoard.removeShip(rowIndex - 1, columnIndex - 1)
       playerGridRectangles(rowIndex - 1)(columnIndex - 1).fill = Color(0, 0, 0, 0)
     } catch {
-      case e: IllegalArgumentException => println(e)
+      case e: IllegalArgumentException => errorNotification(e)
     }
   }
 
@@ -260,13 +262,18 @@ class PlayerInterface(private val playerBoard: Board, private val opponentBoard:
       shotResultMessage.text = shotResult.label
 
     } catch {
-      case e: IllegalArgumentException => println(e)
+      case e: IllegalArgumentException => errorNotification(e)
     }
     endTurnButton.disable = !turnComplete
   }
 
   private def didLoseAllShips(): Boolean = {
     playerBoard.ships.forall(s => s.shotsTaken == s.size)
+  }
+
+  private def errorNotification(e: IllegalArgumentException): Unit = {
+    Notifications.create().title("Inappropriate operation").text(e.getMessage).
+      hideAfter(new Duration(2000)).hideCloseButton().show()
   }
 
   private def autoShot(): Unit = {
